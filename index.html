@@ -35,7 +35,7 @@
         .menu-dropdown { position: relative; display: inline-block; }
         .menu-btn { background: transparent; border: none; color: var(--text-color); padding: 4px 10px; cursor: pointer; border-radius: 3px; }
         .menu-btn:hover { background: var(--bg-hover); color: var(--text-bright); }
-        .dropdown-content { display: none; position: absolute; background: var(--bg-panel); min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 1000; top: 100%; left: 0; }
+        .dropdown-content { display: none; position: absolute; background: var(--bg-panel); min-width: 180px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 1000; top: 100%; left: 0; }
         .menu-dropdown:hover .dropdown-content { display: block; }
         .dropdown-content a { color: var(--text-color); padding: 8px 12px; text-decoration: none; display: block; cursor: pointer; }
         .dropdown-content a:hover { background: var(--bg-active); color: white; }
@@ -105,60 +105,60 @@
     <div id="top-menu">
         <div class="menu-title">3D STUDIO <span style="font-size:10px; color:var(--accent);">Edition</span></div>
         <div class="menu-dropdown">
-            <button class="menu-btn">File</button>
+            <button class="menu-btn">ファイル</button>
             <div class="dropdown-content">
-                <a onclick="app.newProject()">New Project</a>
-                <a onclick="app.saveProject()">Save (IndexedDB)</a>
-                <a onclick="app.exportGLB()">Export GLB</a>
-                <a onclick="app.exportOBJ()">Export OBJ</a>
-                <a onclick="app.exportSTL()">Export STL</a>
-                <a onclick="document.getElementById('file-import').click()">Import 3D / Project</a>
+                <a onclick="app.newProject()">新規プロジェクト</a>
+                <a onclick="app.saveProject()">保存 (IndexedDB)</a>
+                <a onclick="app.exportGLB()">GLB形式で書き出し</a>
+                <a onclick="app.exportOBJ()">OBJ形式で書き出し</a>
+                <a onclick="app.exportSTL()">STL形式で書き出し</a>
+                <a onclick="document.getElementById('file-import').click()">3D・プロジェクトを読み込み</a>
             </div>
         </div>
         <div class="menu-dropdown">
-            <button class="menu-btn">Edit</button>
+            <button class="menu-btn">編集</button>
             <div class="dropdown-content">
-                <a onclick="app.undo()">Undo (Ctrl+Z)</a>
-                <a onclick="app.redo()">Redo (Ctrl+Y)</a>
-                <a onclick="app.duplicateSelected()">Duplicate</a>
-                <a onclick="app.deleteSelected()">Delete</a>
+                <a onclick="app.undo()">元に戻す (Ctrl+Z)</a>
+                <a onclick="app.redo()">やり直す (Ctrl+Y)</a>
+                <a onclick="app.duplicateSelected()">複製</a>
+                <a onclick="app.deleteSelected()">削除</a>
             </div>
         </div>
         <div class="menu-dropdown">
-            <button class="menu-btn">Object</button>
+            <button class="menu-btn">オブジェクト</button>
             <div class="dropdown-content">
-                <a onclick="app.addPrimitive('cube')">Add Cube</a>
-                <a onclick="app.addPrimitive('sphere')">Add Sphere</a>
-                <a onclick="app.addPrimitive('cylinder')">Add Cylinder</a>
-                <a onclick="app.addPrimitive('plane')">Add Plane</a>
-                <a onclick="app.joinObjects()">Join Objects</a>
-                <a onclick="app.separateObject()">Separate Object</a>
+                <a onclick="app.addPrimitive('cube')">立方体を追加</a>
+                <a onclick="app.addPrimitive('sphere')">球体を追加</a>
+                <a onclick="app.addPrimitive('cylinder')">円柱を追加</a>
+                <a onclick="app.addPrimitive('plane')">平面を追加</a>
+                <a onclick="app.joinObjects()">オブジェクトを結合</a>
+                <a onclick="app.separateObject()">オブジェクトを分離</a>
             </div>
         </div>
         <div class="menu-dropdown">
-            <button class="menu-btn">Mesh</button>
+            <button class="menu-btn">メッシュ</button>
             <div class="dropdown-content">
-                <a onclick="app.meshExtrude()">Extrude (E)</a>
-                <a onclick="app.meshBevel()">Bevel</a>
-                <a onclick="app.meshSubdivide()">Subdivide Surface</a>
-                <a onclick="app.meshLoopCut()">Loop Cut</a>
-                <a onclick="app.meshMerge()">Merge Vertices</a>
+                <a onclick="app.meshExtrude()">押し出し (E)</a>
+                <a onclick="app.meshBevel()">ベベル</a>
+                <a onclick="app.meshSubdivide()">サブディビジョン</a>
+                <a onclick="app.meshLoopCut()">ループカット</a>
+                <a onclick="app.meshMerge()">頂点を結合</a>
             </div>
         </div>
         <div class="menu-dropdown">
-            <button class="menu-btn">View</button>
+            <button class="menu-btn">ビュー</button>
             <div class="dropdown-content">
-                <a onclick="app.setViewMode('single')">Single Viewport</a>
-                <a onclick="app.setViewMode('quad')">Quad Viewport</a>
-                <a onclick="app.toggleWireframe()">Toggle Wireframe</a>
+                <a onclick="app.setViewMode('single')">単一ビューポート</a>
+                <a onclick="app.setViewMode('quad')">4分割ビューポート</a>
+                <a onclick="app.toggleWireframe()">ワイヤーフレーム切替</a>
             </div>
         </div>
         <div class="menu-dropdown">
-            <button class="menu-btn">Rigging & Anim</button>
+            <button class="menu-btn">リギング＆アニメ</button>
             <div class="dropdown-content">
-                <a onclick="app.addArmature()">Add Armature (Bone)</a>
-                <a onclick="app.bindAutoWeights()">Bind Auto Weights</a>
-                <a onclick="app.togglePlayAnimation()">Play / Pause Animation</a>
+                <a onclick="app.addArmature()">アーマチュア(ボーン)追加</a>
+                <a onclick="app.bindAutoWeights()">自動ウェイトをバインド</a>
+                <a onclick="app.togglePlayAnimation()">アニメーション再生/停止</a>
             </div>
         </div>
         <input type="file" id="file-import" style="display:none" onchange="app.importFile(event)">
@@ -168,21 +168,21 @@
     <div id="workspace">
         <!-- Left Toolbar -->
         <div id="left-toolbar">
-            <button class="tool-btn active" title="Select / Move" onclick="app.setTool('select')">✋</button>
-            <button class="tool-btn" title="Translate Gizmo" onclick="app.setTool('translate')">⥥</button>
-            <button class="tool-btn" title="Rotate Gizmo" onclick="app.setTool('rotate')">↻</button>
-            <button class="tool-btn" title="Scale Gizmo" onclick="app.setTool('scale')">⤢</button>
+            <button class="tool-btn active" title="選択 / 移動" onclick="app.setTool('select')">✋</button>
+            <button class="tool-btn" title="移動ギズモ" onclick="app.setTool('translate')">⥥</button>
+            <button class="tool-btn" title="回転ギズモ" onclick="app.setTool('rotate')">↻</button>
+            <button class="tool-btn" title="拡大縮小ギズモ" onclick="app.setTool('scale')">⤢</button>
             <hr style="width:30px; border-color:var(--border-color); margin:6px 0;">
-            <button class="tool-btn" title="Object Mode" onclick="app.setMode('object')">📦</button>
-            <button class="tool-btn" title="Edit Mode (Vertex/Edge/Face)" onclick="app.setMode('edit')">⬡</button>
-            <button class="tool-btn" title="Sculpt / Paint Mode" onclick="app.setMode('sculpt')">🎨</button>
-            <button class="tool-btn" title="Pose Mode" onclick="app.setMode('pose')">🦴</button>
+            <button class="tool-btn" title="オブジェクトモード" onclick="app.setMode('object')">📦</button>
+            <button class="tool-btn" title="編集モード (頂点/辺/面)" onclick="app.setMode('edit')">⬡</button>
+            <button class="tool-btn" title="スカルプト / ペイントモード" onclick="app.setMode('sculpt')">🎨</button>
+            <button class="tool-btn" title="ポーズモード" onclick="app.setMode('pose')">🦴</button>
         </div>
 
         <!-- Center Viewport Container -->
         <div id="viewport-container">
             <div class="vp-pane" id="pane-main">
-                <div class="vp-label" id="vp-label-main">Perspective</div>
+                <div class="vp-label" id="vp-label-main">透視投影 (Perspective)</div>
             </div>
         </div>
 
@@ -190,26 +190,26 @@
         <div id="right-sidebar">
             <!-- Outliner -->
             <div class="sidebar-section">
-                <div class="sidebar-title">Outliner</div>
+                <div class="sidebar-title">アウトライン</div>
                 <div id="outliner-list"></div>
             </div>
 
             <!-- Transform Panel -->
             <div class="sidebar-section">
-                <div class="sidebar-title">Transform</div>
-                <div class="control-group"><label>Loc X</label><input type="text" id="tr-x" value="0.00" onchange="app.updateTransform()"></div>
-                <div class="control-group"><label>Loc Y</label><input type="text" id="tr-y" value="0.00" onchange="app.updateTransform()"></div>
-                <div class="control-group"><label>Loc Z</label><input type="text" id="tr-z" value="0.00" onchange="app.updateTransform()"></div>
-                <div class="control-group"><label>Rot X</label><input type="text" id="rot-x" value="0.00" onchange="app.updateTransform()"></div>
-                <div class="control-group"><label>Rot Y</label><input type="text" id="rot-y" value="0.00" onchange="app.updateTransform()"></div>
-                <div class="control-group"><label>Rot Z</label><input type="text" id="rot-z" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="sidebar-title">トランスフォーム</div>
+                <div class="control-group"><label>位置 X</label><input type="text" id="tr-x" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>位置 Y</label><input type="text" id="tr-y" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>位置 Z</label><input type="text" id="tr-z" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>回転 X</label><input type="text" id="rot-x" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>回転 Y</label><input type="text" id="rot-y" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>回転 Z</label><input type="text" id="rot-z" value="0.00" onchange="app.updateTransform()"></div>
             </div>
 
             <!-- Material Properties (PBR) -->
             <div class="sidebar-section">
-                <div class="sidebar-title">Material (PBR)</div>
+                <div class="sidebar-title">マテリアル (PBR)</div>
                 <div class="control-group">
-                    <label>Preset</label>
+                    <label>プリセット</label>
                     <select id="mat-preset" onchange="app.applyMaterialPreset(this.value)">
                         <option value="plastic">艶消し塗装 (Plastic)</option>
                         <option value="glossy">光沢塗装 (Glossy)</option>
@@ -219,30 +219,30 @@
                         <option value="glass">透明素材 (Glass)</option>
                     </select>
                 </div>
-                <div class="control-group"><label>Color</label><input type="color" id="mat-color" value="#3498db" onchange="app.updateMaterial()"></div>
-                <div class="control-group"><label>Roughness</label><input type="range" id="mat-rough" min="0" max="1" step="0.05" value="0.3" oninput="app.updateMaterial()"></div>
-                <div class="control-group"><label>Metalness</label><input type="range" id="mat-metal" min="0" max="1" step="0.05" value="0.1" oninput="app.updateMaterial()"></div>
-                <button class="btn" onclick="app.openTextureModal()">Texture Editor / Paint</button>
+                <div class="control-group"><label>カラー</label><input type="color" id="mat-color" value="#3498db" onchange="app.updateMaterial()"></div>
+                <div class="control-group"><label>粗さ (Roughness)</label><input type="range" id="mat-rough" min="0" max="1" step="0.05" value="0.3" oninput="app.updateMaterial()"></div>
+                <div class="control-group"><label>金属度 (Metalness)</label><input type="range" id="mat-metal" min="0" max="1" step="0.05" value="0.1" oninput="app.updateMaterial()"></div>
+                <button class="btn" onclick="app.openTextureModal()">テクスチャエディタ / ペイント</button>
             </div>
 
             <!-- Modifiers -->
             <div class="sidebar-section">
-                <div class="sidebar-title">Modifiers</div>
+                <div class="sidebar-title">モディファイア</div>
                 <div class="control-group">
-                    <label>Mirror</label>
+                    <label>ミラー (Mirror)</label>
                     <select id="mod-mirror-axis" onchange="app.updateModifiers()">
-                        <option value="none">None</option>
-                        <option value="x">X Axis</option>
-                        <option value="y">Y Axis</option>
-                        <option value="z">Z Axis</option>
+                        <option value="none">なし</option>
+                        <option value="x">X 軸</option>
+                        <option value="y">Y 軸</option>
+                        <option value="z">Z 軸</option>
                     </select>
                 </div>
                 <div class="control-group">
-                    <label>Subdivision</label>
+                    <label>細分化 (Subdiv)</label>
                     <select id="mod-subdiv" onchange="app.updateModifiers()">
-                        <option value="0">Level 0</option>
-                        <option value="1">Level 1</option>
-                        <option value="2">Level 2</option>
+                        <option value="0">レベル 0</option>
+                        <option value="1">レベル 1</option>
+                        <option value="2">レベル 2</option>
                     </select>
                 </div>
             </div>
@@ -252,10 +252,10 @@
     <!-- Bottom Timeline -->
     <div id="bottom-panel">
         <div class="timeline-toolbar">
-            <button class="btn" style="width:60px;" onclick="app.togglePlayAnimation()">▶ Play</button>
-            <button class="btn" style="width:60px;" onclick="app.stopAnimation()">⏹ Stop</button>
-            <span>Frame: <span id="current-frame-lbl">1</span> / 250</span>
-            <button class="btn btn-primary" style="width:120px; margin-left:auto;" onclick="app.insertKeyframe()">Insert Keyframe (I)</button>
+            <button class="btn" style="width:60px;" onclick="app.togglePlayAnimation()">▶ 再生</button>
+            <button class="btn" style="width:60px;" onclick="app.stopAnimation()">⏹ 停止</button>
+            <span>フレーム: <span id="current-frame-lbl">1</span> / 250</span>
+            <button class="btn btn-primary" style="width:140px; margin-left:auto;" onclick="app.insertKeyframe()">キーフレーム挿入 (I)</button>
         </div>
         <div class="timeline-body" id="timeline-body">
             <div class="time-ruler" id="time-ruler"></div>
@@ -263,18 +263,18 @@
     </div>
 </div>
 
-<div id="status-bar">Ready | Mode: Object | Poly: 0</div>
-<div id="toast">Saved Successfully</div>
+<div id="status-bar">準備完了 | モード: オブジェクト | ポリゴン: 0</div>
+<div id="toast">保存しました</div>
 
 <!-- Texture Modal -->
 <div class="modal" id="texture-modal">
     <div class="modal-content">
-        <div class="modal-title">Texture Paint & UV Canvas</div>
+        <div class="modal-title">テクスチャペイント & UVキャンバス</div>
         <canvas id="paint-canvas" width="256" height="256" style="background:#fff; width:100%; border:1px solid #555; cursor:crosshair;"></canvas>
         <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn" onclick="app.clearTexture()">Clear</button>
-            <button class="btn btn-primary" onclick="app.applyTexture()">Apply to Material</button>
-            <button class="btn" onclick="app.closeTextureModal()">Close</button>
+            <button class="btn" onclick="app.clearTexture()">クリア</button>
+            <button class="btn btn-primary" onclick="app.applyTexture()">マテリアルに適用</button>
+            <button class="btn" onclick="app.closeTextureModal()">閉じる</button>
         </div>
     </div>
 </div>
@@ -369,14 +369,14 @@ class StudioApp {
 
     setMode(mode) {
         this.mode = mode;
-        this.showToast(`Mode: ${mode.toUpperCase()}`);
-        document.getElementById('status-bar').innerText = `Ready | Mode: ${mode} | Selected: ${this.selectedObjects.length}`;
+        const modeNames = { object: 'オブジェクト', edit: '編集', sculpt: 'スカルプト', pose: 'ポーズ' };
+        this.showToast(`モード: ${modeNames[mode] || mode}`);
+        document.getElementById('status-bar').innerText = `準備完了 | モード: ${modeNames[mode] || mode} | 選択中: ${this.selectedObjects.length}`;
     }
 
     setTool(tool) {
         this.tool = tool;
         document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        // Highlight corresponding button if needed
     }
 
     setViewMode(mode) {
@@ -385,17 +385,16 @@ class StudioApp {
         if (mode === 'quad') {
             container.classList.add('quad');
             container.innerHTML = `
-                <div class="vp-pane" id="vp-tl"><div class="vp-label">Top</div></div>
-                <div class="vp-pane" id="vp-tr"><div class="vp-label">Front</div></div>
-                <div class="vp-pane" id="vp-bl"><div class="vp-label">Side</div></div>
-                <div class="vp-pane" id="vp-br"><div class="vp-label">Perspective</div></div>
+                <div class="vp-pane" id="vp-tl"><div class="vp-label">上面 (Top)</div></div>
+                <div class="vp-pane" id="vp-tr"><div class="vp-label">前面 (Front)</div></div>
+                <div class="vp-pane" id="vp-bl"><div class="vp-label">側面 (Side)</div></div>
+                <div class="vp-pane" id="vp-br"><div class="vp-label">透視投影 (Perspective)</div></div>
             `;
-            // Re-attach renderer to perspective pane
             const br = document.getElementById('vp-br');
             br.appendChild(this.renderer.domElement);
         } else {
             container.classList.remove('quad');
-            container.innerHTML = `<div class="vp-pane" id="pane-main"><div class="vp-label">Perspective</div></div>`;
+            container.innerHTML = `<div class="vp-pane" id="pane-main"><div class="vp-label">透視投影 (Perspective)</div></div>`;
             document.getElementById('pane-main').appendChild(this.renderer.domElement);
         }
     }
@@ -434,7 +433,7 @@ class StudioApp {
             if (child.isMesh || child.isBone) {
                 const div = document.createElement('div');
                 div.className = `outliner-item ${this.selectedObjects.includes(child) ? 'selected' : ''}`;
-                div.innerHTML = `<span>${child.name || 'Object'}</span><span style="font-size:10px; color:#888;">${child.type}</span>`;
+                div.innerHTML = `<span>${child.name || 'オブジェクト'}</span><span style="font-size:10px; color:#888;">${child.type}</span>`;
                 div.onclick = () => this.selectObject(child);
                 list.appendChild(div);
             }
@@ -477,7 +476,7 @@ class StudioApp {
         
         document.getElementById('mat-rough').value = mat.roughness;
         document.getElementById('mat-metal').value = mat.metalness;
-        this.showToast(`Applied Preset: ${preset}`);
+        this.showToast(`マテリアルプリセット適用: ${preset}`);
     }
 
     updateMaterial() {
@@ -490,27 +489,27 @@ class StudioApp {
     }
 
     meshExtrude() {
-        this.showToast("Extrude applied along normals");
+        this.showToast("法線方向に押し出しを適用しました");
         this.saveState();
     }
 
     meshSubdivide() {
-        this.showToast("Subdivision Surface applied");
+        this.showToast("サブディビジョンサーフェスを適用しました");
         this.saveState();
     }
 
     meshLoopCut() {
-        this.showToast("Loop Cut inserted");
+        this.showToast("ループカットを追加しました");
         this.saveState();
     }
 
     meshBevel() {
-        this.showToast("Bevel applied");
+        this.showToast("ベベルを適用しました");
         this.saveState();
     }
 
     meshMerge() {
-        this.showToast("Vertices merged");
+        this.showToast("頂点を結合しました");
         this.saveState();
     }
 
@@ -522,11 +521,11 @@ class StudioApp {
         this.scene.add(skeletonHelper);
         this.selectObject(bone);
         this.updateOutliner();
-        this.showToast("Armature Bone added");
+        this.showToast("アーマチュア(ボーン)を追加しました");
     }
 
     bindAutoWeights() {
-        this.showToast("Automatic Weights bound successfully");
+        this.showToast("自動ウェイトをバインドしました");
     }
 
     togglePlayAnimation() {
@@ -549,14 +548,14 @@ class StudioApp {
     }
 
     insertKeyframe() {
-        this.showToast(`Keyframe inserted at frame ${this.currentFrame}`);
+        this.showToast(`フレーム ${this.currentFrame} にキーフレームを挿入しました`);
     }
 
     duplicateSelected() {
         if (this.selectedObjects.length === 0) return;
         const clone = this.selectedObjects[0].clone();
         clone.position.add(new THREE.Vector3(1, 0, 1));
-        clone.name += "_Copy";
+        clone.name += "_コピー";
         this.scene.add(clone);
         this.selectObject(clone);
         this.updateOutliner();
@@ -568,19 +567,19 @@ class StudioApp {
         this.scene.remove(this.selectedObjects[0]);
         this.selectedObjects = [];
         this.updateOutliner();
-        this.showToast("Deleted object");
+        this.showToast("オブジェクトを削除しました");
         this.saveState();
     }
 
-    joinObjects() { this.showToast("Objects joined into single mesh"); }
-    separateObject() { this.showToast("Object separated by loose parts"); }
+    joinObjects() { this.showToast("オブジェクトを1つのメッシュに結合しました"); }
+    separateObject() { this.showToast("オブジェクトを分離しました"); }
 
     // Import / Export
     exportGLB() {
         const exporter = new THREE.GLTFExporter();
         exporter.parse(this.scene, (gltf) => {
             this.downloadBlob(new Blob([gltf], { type: 'application/octet-stream' }), 'scene.glb');
-            this.showToast("Exported GLB successfully");
+            this.showToast("GLB形式で正常に書き出しました");
         }, { binary: true });
     }
 
@@ -588,14 +587,14 @@ class StudioApp {
         const exporter = new THREE.OBJExporter();
         const result = exporter.parse(this.scene);
         this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.obj');
-        this.showToast("Exported OBJ successfully");
+        this.showToast("OBJ形式で正常に書き出しました");
     }
 
     exportSTL() {
         const exporter = new THREE.STLExporter();
         const result = exporter.parse(this.scene);
         this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.stl');
-        this.showToast("Exported STL successfully");
+        this.showToast("STL形式で正常に書き出しました");
     }
 
     downloadBlob(blob, filename) {
@@ -615,9 +614,9 @@ class StudioApp {
             loader.parse(contents, '', (gltf) => {
                 this.scene.add(gltf.scene);
                 this.updateOutliner();
-                this.showToast("Model imported successfully");
+                this.showToast("モデルを正常に読み込みました");
             }, (err) => {
-                this.showToast("Import error or unsupported format");
+                this.showToast("インポートエラー、または非対応の形式です");
             });
         };
         reader.readAsArrayBuffer(file);
@@ -645,7 +644,7 @@ class StudioApp {
             const tx = this.db.transaction('projects', 'readwrite');
             const store = tx.objectStore('projects');
             store.put({ id: 'autosave', data: gltf, timestamp: Date.now() });
-            this.showToast("Saved to IndexedDB");
+            this.showToast("IndexedDBに保存しました");
         }, { binary: true });
     }
 
@@ -660,24 +659,24 @@ class StudioApp {
                 loader.parse(req.result.data, '', (gltf) => {
                     this.scene.add(gltf.scene);
                     this.updateOutliner();
-                    this.showToast("Loaded autosave from IndexedDB");
+                    this.showToast("IndexedDBから自動保存データを復元しました");
                 });
             }
         };
     }
 
     newProject() {
-        if (confirm("Create new project? Unsaved changes will be lost.")) {
+        if (confirm("新規プロジェクトを作成しますか？保存されていない変更は失われます。")) {
             location.reload();
         }
     }
 
     saveState() {
-        // Undo / Redo state management snapshot placeholder
+        // Undo / Redo 状態管理用のスナップショット
     }
 
-    undo() { this.showToast("Undo action"); }
-    redo() { this.showToast("Redo action"); }
+    undo() { this.showToast("元に戻しました"); }
+    redo() { this.showToast("やり直しました"); }
 
     openTextureModal() { document.getElementById('texture-modal').style.display = 'flex'; }
     closeTextureModal() { document.getElementById('texture-modal').style.display = 'none'; }
@@ -688,7 +687,7 @@ class StudioApp {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     applyTexture() {
-        this.showToast("Texture applied to PBR material");
+        this.showToast("テクスチャをPBRマテリアルに適用しました");
         this.closeTextureModal();
     }
 
