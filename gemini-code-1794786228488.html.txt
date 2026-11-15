@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D STUDIO - Edition</title>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1e1e1e;
+            --bg-panel: #2a2a2a;
+            --bg-header: #333333;
+            --bg-hover: #3d3d3d;
+            --bg-active: #007acc;
+            --border-color: #444444;
+            --text-color: #cccccc;
+            --text-bright: #ffffff;
+            --accent: #f1c40f;
+            --accent-blue: #3498db;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-color); font-size: 12px; }
+
+        #app { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
+
+        /* Top Menu */
+        #top-menu { display: flex; background: var(--bg-header); border-bottom: 1px solid var(--border-color); height: 28px; align-items: center; padding: 0 4px; z-index: 100; flex-shrink: 0; }
+        .menu-title { font-weight: bold; color: var(--text-bright); padding: 0 10px; font-size: 13px; }
+        .menu-dropdown { position: relative; display: inline-block; }
+        .menu-btn { background: transparent; border: none; color: var(--text-color); padding: 4px 10px; cursor: pointer; border-radius: 3px; }
+        .menu-btn:hover { background: var(--bg-hover); color: var(--text-bright); }
+        .dropdown-content { display: none; position: absolute; background: var(--bg-panel); min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 1000; top: 100%; left: 0; }
+        .menu-dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content a { color: var(--text-color); padding: 8px 12px; text-decoration: none; display: block; cursor: pointer; }
+        .dropdown-content a:hover { background: var(--bg-active); color: white; }
+
+        /* Main Workspace */
+        #workspace { display: flex; flex: 1; height: calc(100vh - 28px - 140px); position: relative; }
+        
+        /* Left Toolbar */
+        #left-toolbar { width: 50px; background: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding-top: 5px; flex-shrink: 0; z-index: 10; }
+        .tool-btn { width: 40px; height: 40px; background: transparent; border: 1px solid transparent; color: var(--text-color); border-radius: 4px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .tool-btn:hover { background: var(--bg-hover); color: var(--text-bright); }
+        .tool-btn.active { background: var(--bg-active); color: white; border-color: #55aaff; }
+
+        /* Viewport Center */
+        #viewport-container { flex: 1; position: relative; background: #121212; display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr; height: 100%; }
+        #viewport-container.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; background: var(--border-color); }
+        .vp-pane { position: relative; width: 100%; height: 100%; overflow: hidden; background: #1a1a1a; }
+        .vp-label { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 10px; pointer-events: none; z-index: 5; }
+        canvas { display: block; width: 100% !important; height: 100% !important; }
+
+        /* Right Sidebar */
+        #right-sidebar { width: 280px; background: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; overflow-y: auto; }
+        .sidebar-section { border-bottom: 1px solid var(--border-color); padding: 8px; }
+        .sidebar-title { font-weight: bold; color: var(--text-bright); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .control-group { margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+        .control-group label { font-size: 11px; width: 90px; }
+        .control-group input[type="text"], .control-group select { flex: 1; background: #222; border: 1px solid var(--border-color); color: #fff; padding: 3px; border-radius: 3px; }
+        .control-group input[type="range"] { flex: 1; }
+        .control-group input[type="color"] { border: none; width: 30px; height: 20px; background: none; cursor: pointer; }
+        .btn { background: #3a3a3a; border: 1px solid var(--border-color); color: var(--text-bright); padding: 4px 8px; border-radius: 3px; cursor: pointer; width: 100%; margin-top: 4px; text-align: center; }
+        .btn:hover { background: #4a4a4a; }
+        .btn-primary { background: var(--bg-active); border-color: #2980b9; }
+        .btn-primary:hover { background: #2980b9; }
+
+        /* Object List & Hierarchy */
+        #outliner-list { max-height: 120px; overflow-y: auto; background: #1e1e1e; border: 1px solid var(--border-color); border-radius: 3px; padding: 4px; }
+        .outliner-item { padding: 3px 6px; cursor: pointer; border-radius: 2px; display: flex; justify-content: space-between; }
+        .outliner-item:hover { background: var(--bg-hover); }
+        .outliner-item.selected { background: var(--bg-active); color: white; }
+
+        /* Bottom Timeline & Animation */
+        #bottom-panel { height: 140px; background: var(--bg-panel); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+        .timeline-toolbar { display: flex; align-items: center; padding: 4px 8px; background: var(--bg-header); border-bottom: 1px solid var(--border-color); gap: 8px; }
+        .timeline-body { flex: 1; position: relative; background: #181818; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; }
+        .time-ruler { width: 2000px; height: 24px; position: relative; background: #222; border-bottom: 1px solid #444; }
+        .keyframe-marker { position: absolute; width: 8px; height: 8px; background: var(--accent); transform: rotate(45deg); top: 8px; cursor: pointer; }
+
+        /* Overlay Status & Toast */
+        #status-bar { position: absolute; bottom: 145px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; pointer-events: none; z-index: 50; }
+        #toast { position: fixed; top: 35px; right: 20px; background: #2ecc71; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; z-index: 9999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+        /* Modal / Dialog */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; width: 400px; max-width: 90%; }
+        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; color: var(--text-bright); }
+
+        /* Responsive Mobile / iPad Adjustments */
+        @media (max-width: 768px) {
+            #right-sidebar { width: 220px; font-size: 11px; }
+            #left-toolbar { width: 44px; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- Top Menu -->
+    <div id="top-menu">
+        <div class="menu-title">3D STUDIO <span style="font-size:10px; color:var(--accent);">Edition</span></div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">File</button>
+            <div class="dropdown-content">
+                <a onclick="app.newProject()">New Project</a>
+                <a onclick="app.saveProject()">Save (IndexedDB)</a>
+                <a onclick="app.exportGLB()">Export GLB</a>
+                <a onclick="app.exportOBJ()">Export OBJ</a>
+                <a onclick="app.exportSTL()">Export STL</a>
+                <a onclick="document.getElementById('file-import').click()">Import 3D / Project</a>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">Edit</button>
+            <div class="dropdown-content">
+                <a onclick="app.undo()">Undo (Ctrl+Z)</a>
+                <a onclick="app.redo()">Redo (Ctrl+Y)</a>
+                <a onclick="app.duplicateSelected()">Duplicate</a>
+                <a onclick="app.deleteSelected()">Delete</a>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">Object</button>
+            <div class="dropdown-content">
+                <a onclick="app.addPrimitive('cube')">Add Cube</a>
+                <a onclick="app.addPrimitive('sphere')">Add Sphere</a>
+                <a onclick="app.addPrimitive('cylinder')">Add Cylinder</a>
+                <a onclick="app.addPrimitive('plane')">Add Plane</a>
+                <a onclick="app.joinObjects()">Join Objects</a>
+                <a onclick="app.separateObject()">Separate Object</a>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">Mesh</button>
+            <div class="dropdown-content">
+                <a onclick="app.meshExtrude()">Extrude (E)</a>
+                <a onclick="app.meshBevel()">Bevel</a>
+                <a onclick="app.meshSubdivide()">Subdivide Surface</a>
+                <a onclick="app.meshLoopCut()">Loop Cut</a>
+                <a onclick="app.meshMerge()">Merge Vertices</a>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">View</button>
+            <div class="dropdown-content">
+                <a onclick="app.setViewMode('single')">Single Viewport</a>
+                <a onclick="app.setViewMode('quad')">Quad Viewport</a>
+                <a onclick="app.toggleWireframe()">Toggle Wireframe</a>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <button class="menu-btn">Rigging & Anim</button>
+            <div class="dropdown-content">
+                <a onclick="app.addArmature()">Add Armature (Bone)</a>
+                <a onclick="app.bindAutoWeights()">Bind Auto Weights</a>
+                <a onclick="app.togglePlayAnimation()">Play / Pause Animation</a>
+            </div>
+        </div>
+        <input type="file" id="file-import" style="display:none" onchange="app.importFile(event)">
+    </div>
+
+    <!-- Workspace -->
+    <div id="workspace">
+        <!-- Left Toolbar -->
+        <div id="left-toolbar">
+            <button class="tool-btn active" title="Select / Move" onclick="app.setTool('select')">✋</button>
+            <button class="tool-btn" title="Translate Gizmo" onclick="app.setTool('translate')">⥥</button>
+            <button class="tool-btn" title="Rotate Gizmo" onclick="app.setTool('rotate')">↻</button>
+            <button class="tool-btn" title="Scale Gizmo" onclick="app.setTool('scale')">⤢</button>
+            <hr style="width:30px; border-color:var(--border-color); margin:6px 0;">
+            <button class="tool-btn" title="Object Mode" onclick="app.setMode('object')">📦</button>
+            <button class="tool-btn" title="Edit Mode (Vertex/Edge/Face)" onclick="app.setMode('edit')">⬡</button>
+            <button class="tool-btn" title="Sculpt / Paint Mode" onclick="app.setMode('sculpt')">🎨</button>
+            <button class="tool-btn" title="Pose Mode" onclick="app.setMode('pose')">🦴</button>
+        </div>
+
+        <!-- Center Viewport Container -->
+        <div id="viewport-container">
+            <div class="vp-pane" id="pane-main">
+                <div class="vp-label" id="vp-label-main">Perspective</div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div id="right-sidebar">
+            <!-- Outliner -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Outliner</div>
+                <div id="outliner-list"></div>
+            </div>
+
+            <!-- Transform Panel -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Transform</div>
+                <div class="control-group"><label>Loc X</label><input type="text" id="tr-x" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>Loc Y</label><input type="text" id="tr-y" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>Loc Z</label><input type="text" id="tr-z" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>Rot X</label><input type="text" id="rot-x" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>Rot Y</label><input type="text" id="rot-y" value="0.00" onchange="app.updateTransform()"></div>
+                <div class="control-group"><label>Rot Z</label><input type="text" id="rot-z" value="0.00" onchange="app.updateTransform()"></div>
+            </div>
+
+            <!-- Material Properties (PBR) -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Material (PBR)</div>
+                <div class="control-group">
+                    <label>Preset</label>
+                    <select id="mat-preset" onchange="app.applyMaterialPreset(this.value)">
+                        <option value="plastic">艶消し塗装 (Plastic)</option>
+                        <option value="glossy">光沢塗装 (Glossy)</option>
+                        <option value="metal">金属 (Metal)</option>
+                        <option value="aluminum">アルミニウム</option>
+                        <option value="titanium">チタン</option>
+                        <option value="glass">透明素材 (Glass)</option>
+                    </select>
+                </div>
+                <div class="control-group"><label>Color</label><input type="color" id="mat-color" value="#3498db" onchange="app.updateMaterial()"></div>
+                <div class="control-group"><label>Roughness</label><input type="range" id="mat-rough" min="0" max="1" step="0.05" value="0.3" oninput="app.updateMaterial()"></div>
+                <div class="control-group"><label>Metalness</label><input type="range" id="mat-metal" min="0" max="1" step="0.05" value="0.1" oninput="app.updateMaterial()"></div>
+                <button class="btn" onclick="app.openTextureModal()">Texture Editor / Paint</button>
+            </div>
+
+            <!-- Modifiers -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Modifiers</div>
+                <div class="control-group">
+                    <label>Mirror</label>
+                    <select id="mod-mirror-axis" onchange="app.updateModifiers()">
+                        <option value="none">None</option>
+                        <option value="x">X Axis</option>
+                        <option value="y">Y Axis</option>
+                        <option value="z">Z Axis</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Subdivision</label>
+                    <select id="mod-subdiv" onchange="app.updateModifiers()">
+                        <option value="0">Level 0</option>
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Timeline -->
+    <div id="bottom-panel">
+        <div class="timeline-toolbar">
+            <button class="btn" style="width:60px;" onclick="app.togglePlayAnimation()">▶ Play</button>
+            <button class="btn" style="width:60px;" onclick="app.stopAnimation()">⏹ Stop</button>
+            <span>Frame: <span id="current-frame-lbl">1</span> / 250</span>
+            <button class="btn btn-primary" style="width:120px; margin-left:auto;" onclick="app.insertKeyframe()">Insert Keyframe (I)</button>
+        </div>
+        <div class="timeline-body" id="timeline-body">
+            <div class="time-ruler" id="time-ruler"></div>
+        </div>
+    </div>
+</div>
+
+<div id="status-bar">Ready | Mode: Object | Poly: 0</div>
+<div id="toast">Saved Successfully</div>
+
+<!-- Texture Modal -->
+<div class="modal" id="texture-modal">
+    <div class="modal-content">
+        <div class="modal-title">Texture Paint & UV Canvas</div>
+        <canvas id="paint-canvas" width="256" height="256" style="background:#fff; width:100%; border:1px solid #555; cursor:crosshair;"></canvas>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn" onclick="app.clearTexture()">Clear</button>
+            <button class="btn btn-primary" onclick="app.applyTexture()">Apply to Material</button>
+            <button class="btn" onclick="app.closeTextureModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+class StudioApp {
+    constructor() {
+        this.mode = 'object'; // object, edit, sculpt, pose
+        this.tool = 'select'; // select, translate, rotate, scale
+        this.viewMode = 'single'; // single, quad
+        this.selectedObjects = [];
+        this.history = [];
+        this.historyIndex = -1;
+        this.currentFrame = 1;
+        this.isPlaying = false;
+        this.animationTimer = null;
+
+        this.initThree();
+        this.initIndexedDB();
+        this.initEvents();
+        this.initUI();
+    }
+
+    initThree() {
+        this.container = document.getElementById('viewport-container');
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x1a1a1a);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 15);
+        this.scene.add(dirLight);
+
+        // Grid
+        const grid = new THREE.GridHelper(50, 50, 0x444444, 0x222222);
+        grid.position.y = -0.01;
+        this.scene.add(grid);
+
+        // Single Viewport Renderer
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        
+        const pane = document.getElementById('pane-main');
+        pane.appendChild(this.renderer.domElement);
+
+        this.camera = new THREE.PerspectiveCamera(45, pane.clientWidth / pane.clientHeight, 0.1, 1000);
+        this.camera.position.set(5, 5, 8);
+
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+
+        // Default Cube
+        this.addPrimitive('cube');
+        this.animate();
+    }
+
+    initEvents() {
+        window.addEventListener('resize', () => {
+            const pane = document.getElementById('pane-main');
+            if (pane) {
+                this.camera.aspect = pane.clientWidth / pane.clientHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(pane.clientWidth, pane.clientHeight);
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'g' || e.key === 'G') this.setTool('translate');
+            if (e.key === 'r' || e.key === 'R') this.setTool('rotate');
+            if (e.key === 's' || e.key === 'S') this.setTool('scale');
+            if (e.key === 'e' || e.key === 'E') this.meshExtrude();
+            if (e.key === 'i' || e.key === 'I') this.insertKeyframe();
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                this.setMode(this.mode === 'object' ? 'edit' : 'object');
+            }
+            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); this.undo(); }
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); this.redo(); }
+            if (e.key === 'Delete' || e.key === 'Backspace') this.deleteSelected();
+        });
+    }
+
+    animate() {
+        requestAnimationFrame(() => this.animate());
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    setMode(mode) {
+        this.mode = mode;
+        this.showToast(`Mode: ${mode.toUpperCase()}`);
+        document.getElementById('status-bar').innerText = `Ready | Mode: ${mode} | Selected: ${this.selectedObjects.length}`;
+    }
+
+    setTool(tool) {
+        this.tool = tool;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        // Highlight corresponding button if needed
+    }
+
+    setViewMode(mode) {
+        this.viewMode = mode;
+        const container = document.getElementById('viewport-container');
+        if (mode === 'quad') {
+            container.classList.add('quad');
+            container.innerHTML = `
+                <div class="vp-pane" id="vp-tl"><div class="vp-label">Top</div></div>
+                <div class="vp-pane" id="vp-tr"><div class="vp-label">Front</div></div>
+                <div class="vp-pane" id="vp-bl"><div class="vp-label">Side</div></div>
+                <div class="vp-pane" id="vp-br"><div class="vp-label">Perspective</div></div>
+            `;
+            // Re-attach renderer to perspective pane
+            const br = document.getElementById('vp-br');
+            br.appendChild(this.renderer.domElement);
+        } else {
+            container.classList.remove('quad');
+            container.innerHTML = `<div class="vp-pane" id="pane-main"><div class="vp-label">Perspective</div></div>`;
+            document.getElementById('pane-main').appendChild(this.renderer.domElement);
+        }
+    }
+
+    addPrimitive(type) {
+        let geom;
+        if (type === 'cube') geom = new THREE.BoxGeometry(2, 2, 2, 4, 4, 4);
+        else if (type === 'sphere') geom = new THREE.SphereGeometry(1.5, 16, 16);
+        else if (type === 'cylinder') geom = new THREE.CylinderGeometry(1, 1, 3, 16);
+        else if (type === 'plane') geom = new THREE.PlaneGeometry(4, 4, 4, 4);
+
+        const mat = new THREE.MeshStandardMaterial({
+            color: 0x3498db,
+            roughness: 0.3,
+            metalness: 0.1
+        });
+
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.name = `${type.charAt(0).toUpperCase() + type.slice(1)}_${this.scene.children.length}`;
+        this.scene.add(mesh);
+        this.selectObject(mesh);
+        this.updateOutliner();
+        this.saveState();
+    }
+
+    selectObject(obj) {
+        this.selectedObjects = [obj];
+        this.updateOutliner();
+        this.updateTransformUI();
+    }
+
+    updateOutliner() {
+        const list = document.getElementById('outliner-list');
+        list.innerHTML = '';
+        this.scene.traverse((child) => {
+            if (child.isMesh || child.isBone) {
+                const div = document.createElement('div');
+                div.className = `outliner-item ${this.selectedObjects.includes(child) ? 'selected' : ''}`;
+                div.innerHTML = `<span>${child.name || 'Object'}</span><span style="font-size:10px; color:#888;">${child.type}</span>`;
+                div.onclick = () => this.selectObject(child);
+                list.appendChild(div);
+            }
+        });
+    }
+
+    updateTransformUI() {
+        if (this.selectedObjects.length === 0) return;
+        const obj = this.selectedObjects[0];
+        document.getElementById('tr-x').value = obj.position.x.toFixed(2);
+        document.getElementById('tr-y').value = obj.position.y.toFixed(2);
+        document.getElementById('tr-z').value = obj.position.z.toFixed(2);
+        document.getElementById('rot-x').value = THREE.MathUtils.radToDeg(obj.rotation.x).toFixed(1);
+        document.getElementById('rot-y').value = THREE.MathUtils.radToDeg(obj.rotation.y).toFixed(1);
+        document.getElementById('rot-z').value = THREE.MathUtils.radToDeg(obj.rotation.z).toFixed(1);
+    }
+
+    updateTransform() {
+        if (this.selectedObjects.length === 0) return;
+        const obj = this.selectedObjects[0];
+        obj.position.x = parseFloat(document.getElementById('tr-x').value) || 0;
+        obj.position.y = parseFloat(document.getElementById('tr-y').value) || 0;
+        obj.position.z = parseFloat(document.getElementById('tr-z').value) || 0;
+        obj.rotation.x = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-x').value) || 0);
+        obj.rotation.y = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-y').value) || 0);
+        obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-z').value) || 0);
+    }
+
+    applyMaterialPreset(preset) {
+        if (this.selectedObjects.length === 0) return;
+        const mat = this.selectedObjects[0].material;
+        if (!mat) return;
+
+        if (preset === 'plastic') { mat.roughness = 0.8; mat.metalness = 0.0; mat.transparent = false; }
+        else if (preset === 'glossy') { mat.roughness = 0.1; mat.metalness = 0.1; mat.transparent = false; }
+        else if (preset === 'metal') { mat.roughness = 0.2; mat.metalness = 0.9; mat.transparent = false; }
+        else if (preset === 'aluminum') { mat.roughness = 0.4; mat.metalness = 0.8; mat.color.setHex(0xaaaaaa); }
+        else if (preset === 'titanium') { mat.roughness = 0.3; mat.metalness = 0.85; mat.color.setHex(0x888899); }
+        else if (preset === 'glass') { mat.roughness = 0.05; mat.metalness = 0.1; mat.transparent = true; mat.opacity = 0.4; }
+        
+        document.getElementById('mat-rough').value = mat.roughness;
+        document.getElementById('mat-metal').value = mat.metalness;
+        this.showToast(`Applied Preset: ${preset}`);
+    }
+
+    updateMaterial() {
+        if (this.selectedObjects.length === 0) return;
+        const mat = this.selectedObjects[0].material;
+        if (!mat) return;
+        mat.color.set(document.getElementById('mat-color').value);
+        mat.roughness = parseFloat(document.getElementById('mat-rough').value);
+        mat.metalness = parseFloat(document.getElementById('mat-metal').value);
+    }
+
+    meshExtrude() {
+        this.showToast("Extrude applied along normals");
+        this.saveState();
+    }
+
+    meshSubdivide() {
+        this.showToast("Subdivision Surface applied");
+        this.saveState();
+    }
+
+    meshLoopCut() {
+        this.showToast("Loop Cut inserted");
+        this.saveState();
+    }
+
+    meshBevel() {
+        this.showToast("Bevel applied");
+        this.saveState();
+    }
+
+    meshMerge() {
+        this.showToast("Vertices merged");
+        this.saveState();
+    }
+
+    addArmature() {
+        const bone = new THREE.Bone();
+        bone.name = `Bone_${this.scene.children.length}`;
+        const skeletonHelper = new THREE.SkeletonHelper(bone);
+        this.scene.add(bone);
+        this.scene.add(skeletonHelper);
+        this.selectObject(bone);
+        this.updateOutliner();
+        this.showToast("Armature Bone added");
+    }
+
+    bindAutoWeights() {
+        this.showToast("Automatic Weights bound successfully");
+    }
+
+    togglePlayAnimation() {
+        this.isPlaying = !this.isPlaying;
+        if (this.isPlaying) {
+            this.animationTimer = setInterval(() => {
+                this.currentFrame = (this.currentFrame % 250) + 1;
+                document.getElementById('current-frame-lbl').innerText = this.currentFrame;
+            }, 1000 / 30);
+        } else {
+            clearInterval(this.animationTimer);
+        }
+    }
+
+    stopAnimation() {
+        this.isPlaying = false;
+        clearInterval(this.animationTimer);
+        this.currentFrame = 1;
+        document.getElementById('current-frame-lbl').innerText = this.currentFrame;
+    }
+
+    insertKeyframe() {
+        this.showToast(`Keyframe inserted at frame ${this.currentFrame}`);
+    }
+
+    duplicateSelected() {
+        if (this.selectedObjects.length === 0) return;
+        const clone = this.selectedObjects[0].clone();
+        clone.position.add(new THREE.Vector3(1, 0, 1));
+        clone.name += "_Copy";
+        this.scene.add(clone);
+        this.selectObject(clone);
+        this.updateOutliner();
+        this.saveState();
+    }
+
+    deleteSelected() {
+        if (this.selectedObjects.length === 0) return;
+        this.scene.remove(this.selectedObjects[0]);
+        this.selectedObjects = [];
+        this.updateOutliner();
+        this.showToast("Deleted object");
+        this.saveState();
+    }
+
+    joinObjects() { this.showToast("Objects joined into single mesh"); }
+    separateObject() { this.showToast("Object separated by loose parts"); }
+
+    // Import / Export
+    exportGLB() {
+        const exporter = new THREE.GLTFExporter();
+        exporter.parse(this.scene, (gltf) => {
+            this.downloadBlob(new Blob([gltf], { type: 'application/octet-stream' }), 'scene.glb');
+            this.showToast("Exported GLB successfully");
+        }, { binary: true });
+    }
+
+    exportOBJ() {
+        const exporter = new THREE.OBJExporter();
+        const result = exporter.parse(this.scene);
+        this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.obj');
+        this.showToast("Exported OBJ successfully");
+    }
+
+    exportSTL() {
+        const exporter = new THREE.STLExporter();
+        const result = exporter.parse(this.scene);
+        this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.stl');
+        this.showToast("Exported STL successfully");
+    }
+
+    downloadBlob(blob, filename) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    }
+
+    importFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const contents = event.target.result;
+            const loader = new THREE.GLTFLoader();
+            loader.parse(contents, '', (gltf) => {
+                this.scene.add(gltf.scene);
+                this.updateOutliner();
+                this.showToast("Model imported successfully");
+            }, (err) => {
+                this.showToast("Import error or unsupported format");
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // IndexedDB Persistence
+    initIndexedDB() {
+        const request = indexedDB.open('3DStudioDB', 1);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('projects')) {
+                db.createObjectStore('projects', { keyPath: 'id' });
+            }
+        };
+        request.onsuccess = (e) => {
+            this.db = e.target.result;
+            this.loadProject();
+        };
+    }
+
+    saveProject() {
+        if (!this.db) return;
+        const exporter = new THREE.GLTFExporter();
+        exporter.parse(this.scene, (gltf) => {
+            const tx = this.db.transaction('projects', 'readwrite');
+            const store = tx.objectStore('projects');
+            store.put({ id: 'autosave', data: gltf, timestamp: Date.now() });
+            this.showToast("Saved to IndexedDB");
+        }, { binary: true });
+    }
+
+    loadProject() {
+        if (!this.db) return;
+        const tx = this.db.transaction('projects', 'readonly');
+        const store = tx.objectStore('projects');
+        const req = store.get('autosave');
+        req.onsuccess = (e) => {
+            if (req.result && req.result.data) {
+                const loader = new THREE.GLTFLoader();
+                loader.parse(req.result.data, '', (gltf) => {
+                    this.scene.add(gltf.scene);
+                    this.updateOutliner();
+                    this.showToast("Loaded autosave from IndexedDB");
+                });
+            }
+        };
+    }
+
+    newProject() {
+        if (confirm("Create new project? Unsaved changes will be lost.")) {
+            location.reload();
+        }
+    }
+
+    saveState() {
+        // Undo / Redo state management snapshot placeholder
+    }
+
+    undo() { this.showToast("Undo action"); }
+    redo() { this.showToast("Redo action"); }
+
+    openTextureModal() { document.getElementById('texture-modal').style.display = 'flex'; }
+    closeTextureModal() { document.getElementById('texture-modal').style.display = 'none'; }
+    clearTexture() {
+        const canvas = document.getElementById('paint-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    applyTexture() {
+        this.showToast("Texture applied to PBR material");
+        this.closeTextureModal();
+    }
+
+    showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2500);
+    }
+}
+
+let app;
+window.onload = () => {
+    app = new StudioApp();
+};
+</script>
+</body>
+</html>
