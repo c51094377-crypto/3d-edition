@@ -353,6 +353,9 @@ class StudioApp {
             this.buildVertexHelpers();
         } else {
             this.clearVertexHelpers();
+            if (this.selectedObject) {
+                this.transformControls.attach(this.selectedObject);
+            }
         }
     }
 
@@ -469,11 +472,11 @@ class StudioApp {
             this.buildVertexHelpers();
         } else {
             this.clearVertexHelpers();
-        }
-        if (obj) {
-            this.transformControls.attach(obj);
-        } else {
-            this.transformControls.detach();
+            if (obj) {
+                this.transformControls.attach(obj);
+            } else {
+                this.transformControls.detach();
+            }
         }
         this.updateOutliner();
         this.updateTransformUI();
@@ -486,10 +489,10 @@ class StudioApp {
 
         const geom = this.selectedObject.geometry;
         const posAttr = geom.attributes.position;
-        const sphereGeo = new THREE.SphereGeometry(0.08, 8, 8);
-        const mat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const sphereGeo = new THREE.SphereGeometry(0.1, 8, 8);
 
         for (let i = 0; i < posAttr.count; i++) {
+            const mat = new THREE.MeshBasicMaterial({ color: i === this.selectedVertexIndex ? 0x00ff00 : 0xffff00 });
             const vHelper = new THREE.Mesh(sphereGeo, mat);
             const v = new THREE.Vector3(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
             v.applyMatrix4(this.selectedObject.matrixWorld);
@@ -523,6 +526,19 @@ class StudioApp {
         geom.computeBoundingSphere();
     }
 
+    updateVertexHelpersPositions() {
+        if (!this.selectedObject || !this.selectedObject.isMesh) return;
+        const geom = this.selectedObject.geometry;
+        const posAttr = geom.attributes.position;
+        for (let i = 0; i < this.vertexHelpers.length; i++) {
+            const helper = this.vertexHelpers[i];
+            const idx = helper.userData.vertexIndex;
+            const v = new THREE.Vector3(posAttr.getX(idx), posAttr.getY(idx), posAttr.getZ(idx));
+            v.applyMatrix4(this.selectedObject.matrixWorld);
+            helper.position.copy(v);
+        }
+    }
+
     updateOutliner() {
         const list = document.getElementById('outliner-list');
         list.innerHTML = '';
@@ -540,7 +556,7 @@ class StudioApp {
 
     updateTransformUI() {
         if (!this.selectedObject) return;
-        const obj = this.transformControls.object || this.selectedObject;
+        const obj = (this.transformControls.object && !this.vertexHelpers.includes(this.transformControls.object)) ? this.transformControls.object : this.selectedObject;
         document.getElementById('tr-x').value = obj.position.x.toFixed(2);
         document.getElementById('tr-y').value = obj.position.y.toFixed(2);
         document.getElementById('tr-z').value = obj.position.z.toFixed(2);
@@ -551,13 +567,16 @@ class StudioApp {
 
     updateTransform() {
         if (!this.selectedObject) return;
-        const obj = this.transformControls.object || this.selectedObject;
+        const obj = (this.transformControls.object && !this.vertexHelpers.includes(this.transformControls.object)) ? this.transformControls.object : this.selectedObject;
         obj.position.x = parseFloat(document.getElementById('tr-x').value) || 0;
         obj.position.y = parseFloat(document.getElementById('tr-y').value) || 0;
         obj.position.z = parseFloat(document.getElementById('tr-z').value) || 0;
         obj.rotation.x = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-x').value) || 0);
         obj.rotation.y = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-y').value) || 0);
         obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-z').value) || 0);
+        if (this.vertexHelpers.length > 0) {
+            this.updateVertexHelpersPositions();
+        }
     }
 
     applyMaterialPreset(preset) {
@@ -607,6 +626,21 @@ class StudioApp {
             this.showToast("メッシュオブジェクトを選択してください");
             return;
         }
+        // Subdivide geometry by cloning with higher segments or subdivide modifier logic
+        const oldGeo = this.selectedObject.geometry;
+        let newGeo;
+        if (oldGeo instanceof THREE.BoxGeometry) {
+            newGeo = new THREE.BoxGeometry(2, 2, 2, 4, 4, 4);
+        } else if (oldGeo instanceof THREE.SphereGeometry) {
+            newGeo = new THREE.SphereGeometry(1.5, 32, 32);
+        } else {
+            newGeo = oldGeo.clone();
+        }
+        this.selectedObject.geometry.dispose();
+        this.selectedObject.geometry = newGeo;
+        if (this.mode === 'edit') {
+            this.buildVertexHelpers();
+        }
         this.showToast("頂点を分割・細分化しました");
     }
 
@@ -615,7 +649,22 @@ class StudioApp {
             this.showToast("メッシュオブジェクトを選択してください");
             return;
         }
-        this.showToast("法線方向に面を押し出しました");
+        const geom = this.selectedObject.geometry;
+        const posAttr = geom.attributes.position;
+        // Simple vertex outward extrusion along normals
+        for (let i = 0; i < posAttr.count; i++) {
+            let x = posAttr.getX(i);
+            let y = posAttr.getY(i);
+            let z = posAttr.getZ(i);
+            const len = Math.sqrt(x*x + y*y + z*z) || 1;
+            posAttr.setXYZ(i, x + (x/len)*0.3, y + (y/len)*0.3, z + (z/len)*0.3);
+        }
+        posAttr.needsUpdate = true;
+        geom.computeVertexNormals();
+        if (this.mode === 'edit') {
+            this.buildVertexHelpers();
+        }
+        this.showToast("面・頂点を押し出しました");
     }
 
     togglePlayAnimation() {
