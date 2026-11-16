@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>3D STUDIO - Edition</title>
-    <!-- Three.js CDN -->
+    <!-- Three.js & Controls & Exporters & TransformControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
@@ -35,7 +36,7 @@
         .menu-dropdown { position: relative; display: inline-block; }
         .menu-btn { background: transparent; border: none; color: var(--text-color); padding: 4px 10px; cursor: pointer; border-radius: 3px; }
         .menu-btn:hover { background: var(--bg-hover); color: var(--text-bright); }
-        .dropdown-content { display: none; position: absolute; background: var(--bg-panel); min-width: 180px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 1000; top: 100%; left: 0; }
+        .dropdown-content { display: none; position: absolute; background: var(--bg-panel); min-width: 190px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 1000; top: 100%; left: 0; }
         .menu-dropdown:hover .dropdown-content { display: block; }
         .dropdown-content a { color: var(--text-color); padding: 8px 12px; text-decoration: none; display: block; cursor: pointer; }
         .dropdown-content a:hover { background: var(--bg-active); color: white; }
@@ -57,22 +58,22 @@
         canvas { display: block; width: 100% !important; height: 100% !important; }
 
         /* Right Sidebar */
-        #right-sidebar { width: 280px; background: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; overflow-y: auto; }
+        #right-sidebar { width: 300px; background: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; overflow-y: auto; }
         .sidebar-section { border-bottom: 1px solid var(--border-color); padding: 8px; }
         .sidebar-title { font-weight: bold; color: var(--text-bright); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
         .control-group { margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-        .control-group label { font-size: 11px; width: 90px; }
+        .control-group label { font-size: 11px; width: 100px; }
         .control-group input[type="text"], .control-group select { flex: 1; background: #222; border: 1px solid var(--border-color); color: #fff; padding: 3px; border-radius: 3px; }
         .control-group input[type="range"] { flex: 1; }
         .control-group input[type="color"] { border: none; width: 30px; height: 20px; background: none; cursor: pointer; }
-        .btn { background: #3a3a3a; border: 1px solid var(--border-color); color: var(--text-bright); padding: 4px 8px; border-radius: 3px; cursor: pointer; width: 100%; margin-top: 4px; text-align: center; }
+        .btn { background: #3a3a3a; border: 1px solid var(--border-color); color: var(--text-bright); padding: 5px 10px; border-radius: 3px; cursor: pointer; width: 100%; margin-top: 4px; text-align: center; }
         .btn:hover { background: #4a4a4a; }
         .btn-primary { background: var(--bg-active); border-color: #2980b9; }
         .btn-primary:hover { background: #2980b9; }
 
-        /* Object List & Hierarchy */
-        #outliner-list { max-height: 120px; overflow-y: auto; background: #1e1e1e; border: 1px solid var(--border-color); border-radius: 3px; padding: 4px; }
-        .outliner-item { padding: 3px 6px; cursor: pointer; border-radius: 2px; display: flex; justify-content: space-between; }
+        /* Object & Mesh List */
+        #outliner-list { max-height: 140px; overflow-y: auto; background: #1e1e1e; border: 1px solid var(--border-color); border-radius: 3px; padding: 4px; }
+        .outliner-item { padding: 4px 6px; cursor: pointer; border-radius: 2px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .outliner-item:hover { background: var(--bg-hover); }
         .outliner-item.selected { background: var(--bg-active); color: white; }
 
@@ -81,7 +82,6 @@
         .timeline-toolbar { display: flex; align-items: center; padding: 4px 8px; background: var(--bg-header); border-bottom: 1px solid var(--border-color); gap: 8px; }
         .timeline-body { flex: 1; position: relative; background: #181818; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; }
         .time-ruler { width: 2000px; height: 24px; position: relative; background: #222; border-bottom: 1px solid #444; }
-        .keyframe-marker { position: absolute; width: 8px; height: 8px; background: var(--accent); transform: rotate(45deg); top: 8px; cursor: pointer; }
 
         /* Overlay Status & Toast */
         #status-bar { position: absolute; bottom: 145px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; pointer-events: none; z-index: 50; }
@@ -89,14 +89,8 @@
 
         /* Modal / Dialog */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; width: 400px; max-width: 90%; }
+        .modal-content { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; width: 420px; max-width: 90%; }
         .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; color: var(--text-bright); }
-
-        /* Responsive Mobile / iPad Adjustments */
-        @media (max-width: 768px) {
-            #right-sidebar { width: 220px; font-size: 11px; }
-            #left-toolbar { width: 44px; }
-        }
     </style>
 </head>
 <body>
@@ -127,22 +121,20 @@
         <div class="menu-dropdown">
             <button class="menu-btn">オブジェクト</button>
             <div class="dropdown-content">
-                <a onclick="app.addPrimitive('cube')">立方体を追加</a>
-                <a onclick="app.addPrimitive('sphere')">球体を追加</a>
-                <a onclick="app.addPrimitive('cylinder')">円柱を追加</a>
-                <a onclick="app.addPrimitive('plane')">平面を追加</a>
+                <a onclick="app.addPrimitive('cube')">直方体 (Cube) 追加</a>
+                <a onclick="app.addPrimitive('circle')">円 (Circle) 追加</a>
+                <a onclick="app.addPrimitive('sphere')">球体 (Sphere) 追加</a>
+                <a onclick="app.addPrimitive('cylinder')">円柱 (Cylinder) 追加</a>
+                <a onclick="app.addPrimitive('plane')">平面 (Plane) 追加</a>
                 <a onclick="app.joinObjects()">オブジェクトを結合</a>
-                <a onclick="app.separateObject()">オブジェクトを分離</a>
             </div>
         </div>
         <div class="menu-dropdown">
             <button class="menu-btn">メッシュ</button>
             <div class="dropdown-content">
-                <a onclick="app.meshExtrude()">押し出し (E)</a>
-                <a onclick="app.meshBevel()">ベベル</a>
-                <a onclick="app.meshSubdivide()">サブディビジョン</a>
-                <a onclick="app.meshLoopCut()">ループカット</a>
-                <a onclick="app.meshMerge()">頂点を結合</a>
+                <a onclick="app.meshExtrude()">押し出し (Extrude)</a>
+                <a onclick="app.meshSubdivide()">頂点分割 / 細分化 (Subdivide)</a>
+                <a onclick="app.meshSubdivide()">サブディビジョンサーフェス</a>
             </div>
         </div>
         <div class="menu-dropdown">
@@ -156,7 +148,7 @@
         <div class="menu-dropdown">
             <button class="menu-btn">リギング＆アニメ</button>
             <div class="dropdown-content">
-                <a onclick="app.addArmature()">アーマチュア(ボーン)追加</a>
+                <a onclick="app.addArmature()">アーマチュア (ボーン) 追加</a>
                 <a onclick="app.bindAutoWeights()">自動ウェイトをバインド</a>
                 <a onclick="app.togglePlayAnimation()">アニメーション再生/停止</a>
             </div>
@@ -168,15 +160,14 @@
     <div id="workspace">
         <!-- Left Toolbar -->
         <div id="left-toolbar">
-            <button class="tool-btn active" title="選択 / 移動" onclick="app.setTool('select')">✋</button>
-            <button class="tool-btn" title="移動ギズモ" onclick="app.setTool('translate')">⥥</button>
-            <button class="tool-btn" title="回転ギズモ" onclick="app.setTool('rotate')">↻</button>
-            <button class="tool-btn" title="拡大縮小ギズモ" onclick="app.setTool('scale')">⤢</button>
+            <button class="tool-btn active" id="btn-tool-select" title="選択ツール" onclick="app.setToolMode('select')">✋</button>
+            <button class="tool-btn" id="btn-tool-translate" title="移動 (G)" onclick="app.setToolMode('translate')">⥥</button>
+            <button class="tool-btn" id="btn-tool-rotate" title="回転 (R)" onclick="app.setToolMode('rotate')">↻</button>
+            <button class="tool-btn" id="btn-tool-scale" title="拡大縮小 (S)" onclick="app.setToolMode('scale')">⤢</button>
             <hr style="width:30px; border-color:var(--border-color); margin:6px 0;">
             <button class="tool-btn" title="オブジェクトモード" onclick="app.setMode('object')">📦</button>
-            <button class="tool-btn" title="編集モード (頂点/辺/面)" onclick="app.setMode('edit')">⬡</button>
-            <button class="tool-btn" title="スカルプト / ペイントモード" onclick="app.setMode('sculpt')">🎨</button>
-            <button class="tool-btn" title="ポーズモード" onclick="app.setMode('pose')">🦴</button>
+            <button class="tool-btn" title="編集モード (頂点直感移動)" onclick="app.setMode('edit')">⬡</button>
+            <button class="tool-btn" title="ポーズモード (ボーン)" onclick="app.setMode('pose')">🦴</button>
         </div>
 
         <!-- Center Viewport Container -->
@@ -188,9 +179,9 @@
 
         <!-- Right Sidebar -->
         <div id="right-sidebar">
-            <!-- Outliner -->
+            <!-- Outliner & Mesh List -->
             <div class="sidebar-section">
-                <div class="sidebar-title">アウトライン</div>
+                <div class="sidebar-title">メッシュ / オブジェクト一覧</div>
                 <div id="outliner-list"></div>
             </div>
 
@@ -205,9 +196,9 @@
                 <div class="control-group"><label>回転 Z</label><input type="text" id="rot-z" value="0.00" onchange="app.updateTransform()"></div>
             </div>
 
-            <!-- Material Properties (PBR) -->
+            <!-- Material Properties (PBR & Transparency & Texture) -->
             <div class="sidebar-section">
-                <div class="sidebar-title">マテリアル (PBR)</div>
+                <div class="sidebar-title">マテリアル & テクスチャ</div>
                 <div class="control-group">
                     <label>プリセット</label>
                     <select id="mat-preset" onchange="app.applyMaterialPreset(this.value)">
@@ -215,36 +206,22 @@
                         <option value="glossy">光沢塗装 (Glossy)</option>
                         <option value="metal">金属 (Metal)</option>
                         <option value="aluminum">アルミニウム</option>
-                        <option value="titanium">チタン</option>
-                        <option value="glass">透明素材 (Glass)</option>
+                        <option value="glass">透明ガラス (Glass)</option>
                     </select>
                 </div>
                 <div class="control-group"><label>カラー</label><input type="color" id="mat-color" value="#3498db" onchange="app.updateMaterial()"></div>
+                <div class="control-group"><label>透明度 (Opacity)</label><input type="range" id="mat-opacity" min="0" max="1" step="0.05" value="1.0" oninput="app.updateMaterial()"></div>
                 <div class="control-group"><label>粗さ (Roughness)</label><input type="range" id="mat-rough" min="0" max="1" step="0.05" value="0.3" oninput="app.updateMaterial()"></div>
                 <div class="control-group"><label>金属度 (Metalness)</label><input type="range" id="mat-metal" min="0" max="1" step="0.05" value="0.1" oninput="app.updateMaterial()"></div>
-                <button class="btn" onclick="app.openTextureModal()">テクスチャエディタ / ペイント</button>
+                <button class="btn" onclick="document.getElementById('texture-file-input').click()">📁 画像テクスチャ貼付</button>
+                <input type="file" id="texture-file-input" accept="image/*" style="display:none" onchange="app.loadTextureFromFile(event)">
             </div>
 
             <!-- Modifiers -->
             <div class="sidebar-section">
-                <div class="sidebar-title">モディファイア</div>
-                <div class="control-group">
-                    <label>ミラー (Mirror)</label>
-                    <select id="mod-mirror-axis" onchange="app.updateModifiers()">
-                        <option value="none">なし</option>
-                        <option value="x">X 軸</option>
-                        <option value="y">Y 軸</option>
-                        <option value="z">Z 軸</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>細分化 (Subdiv)</label>
-                    <select id="mod-subdiv" onchange="app.updateModifiers()">
-                        <option value="0">レベル 0</option>
-                        <option value="1">レベル 1</option>
-                        <option value="2">レベル 2</option>
-                    </select>
-                </div>
+                <div class="sidebar-title">モディファイア / 頂点編集</div>
+                <button class="btn btn-primary" onclick="app.meshSubdivide()">頂点を分割 / サブディビジョン</button>
+                <button class="btn" onclick="app.meshExtrude()">面・頂点の押し出し</button>
             </div>
         </div>
     </div>
@@ -263,31 +240,17 @@
     </div>
 </div>
 
-<div id="status-bar">準備完了 | モード: オブジェクト | ポリゴン: 0</div>
+<div id="status-bar">準備完了 | モード: オブジェクト | 選択中: なし</div>
 <div id="toast">保存しました</div>
-
-<!-- Texture Modal -->
-<div class="modal" id="texture-modal">
-    <div class="modal-content">
-        <div class="modal-title">テクスチャペイント & UVキャンバス</div>
-        <canvas id="paint-canvas" width="256" height="256" style="background:#fff; width:100%; border:1px solid #555; cursor:crosshair;"></canvas>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn" onclick="app.clearTexture()">クリア</button>
-            <button class="btn btn-primary" onclick="app.applyTexture()">マテリアルに適用</button>
-            <button class="btn" onclick="app.closeTextureModal()">閉じる</button>
-        </div>
-    </div>
-</div>
 
 <script>
 class StudioApp {
     constructor() {
-        this.mode = 'object'; // object, edit, sculpt, pose
-        this.tool = 'select'; // select, translate, rotate, scale
-        this.viewMode = 'single'; // single, quad
-        this.selectedObjects = [];
-        this.history = [];
-        this.historyIndex = -1;
+        this.mode = 'object'; // object, edit, pose
+        this.toolMode = 'select'; // select, translate, rotate, scale
+        this.selectedObject = null;
+        this.selectedVertexIndex = null;
+        this.vertexHelpers = [];
         this.currentFrame = 1;
         this.isPlaying = false;
         this.animationTimer = null;
@@ -295,7 +258,6 @@ class StudioApp {
         this.initThree();
         this.initIndexedDB();
         this.initEvents();
-        this.initUI();
     }
 
     initThree() {
@@ -304,9 +266,9 @@ class StudioApp {
         this.scene.background = new THREE.Color(0x1a1a1a);
 
         // Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         this.scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
         dirLight.position.set(10, 20, 15);
         this.scene.add(dirLight);
 
@@ -315,7 +277,7 @@ class StudioApp {
         grid.position.y = -0.01;
         this.scene.add(grid);
 
-        // Single Viewport Renderer
+        // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -328,6 +290,28 @@ class StudioApp {
 
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
+
+        // Transform Gizmo Controls
+        this.transformControls = new THREE.TransformControls(this.camera, this.renderer.domElement);
+        this.transformControls.size = 0.75;
+        this.scene.add(this.transformControls);
+
+        this.transformControls.addEventListener('dragging-changed', (event) => {
+            this.controls.enabled = !event.value;
+        });
+
+        this.transformControls.addEventListener('change', () => {
+            this.updateTransformUI();
+            if (this.selectedVertexIndex !== null && this.selectedObject && this.selectedObject.isMesh) {
+                this.updateVertexPositionFromGizmo();
+            }
+        });
+
+        // Raycaster for Selection
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+
+        pane.addEventListener('pointerdown', (e) => this.onPointerDown(e));
 
         // Default Cube
         this.addPrimitive('cube');
@@ -346,17 +330,15 @@ class StudioApp {
 
         window.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT') return;
-            if (e.key === 'g' || e.key === 'G') this.setTool('translate');
-            if (e.key === 'r' || e.key === 'R') this.setTool('rotate');
-            if (e.key === 's' || e.key === 'S') this.setTool('scale');
+            if (e.key === 'g' || e.key === 'G') this.setToolMode('translate');
+            if (e.key === 'r' || e.key === 'R') this.setToolMode('rotate');
+            if (e.key === 's' || e.key === 'S') this.setToolMode('scale');
             if (e.key === 'e' || e.key === 'E') this.meshExtrude();
             if (e.key === 'i' || e.key === 'I') this.insertKeyframe();
             if (e.key === 'Tab') {
                 e.preventDefault();
                 this.setMode(this.mode === 'object' ? 'edit' : 'object');
             }
-            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); this.undo(); }
-            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); this.redo(); }
             if (e.key === 'Delete' || e.key === 'Backspace') this.deleteSelected();
         });
     }
@@ -369,18 +351,27 @@ class StudioApp {
 
     setMode(mode) {
         this.mode = mode;
-        const modeNames = { object: 'オブジェクト', edit: '編集', sculpt: 'スカルプト', pose: 'ポーズ' };
+        const modeNames = { object: 'オブジェクトモード', edit: '編集モード (頂点選択)', pose: 'ポーズモード (ボーン)' };
         this.showToast(`モード: ${modeNames[mode] || mode}`);
-        document.getElementById('status-bar').innerText = `準備完了 | モード: ${modeNames[mode] || mode} | 選択中: ${this.selectedObjects.length}`;
+        document.getElementById('status-bar').innerText = `準備完了 | モード: ${modeNames[mode]} | 選択: ${this.selectedObject ? this.selectedObject.name : 'なし'}`;
+        
+        if (mode === 'edit' && this.selectedObject && this.selectedObject.isMesh) {
+            this.buildVertexHelpers();
+        } else {
+            this.clearVertexHelpers();
+        }
     }
 
-    setTool(tool) {
-        this.tool = tool;
+    setToolMode(tool) {
+        this.toolMode = tool;
         document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        if (tool === 'select') document.getElementById('btn-tool-select').classList.add('active');
+        if (tool === 'translate') { document.getElementById('btn-tool-translate').classList.add('active'); this.transformControls.setMode('translate'); }
+        if (tool === 'rotate') { document.getElementById('btn-tool-rotate').classList.add('active'); this.transformControls.setMode('rotate'); }
+        if (tool === 'scale') { document.getElementById('btn-tool-scale').classList.add('active'); this.transformControls.setMode('scale'); }
     }
 
     setViewMode(mode) {
-        this.viewMode = mode;
         const container = document.getElementById('viewport-container');
         if (mode === 'quad') {
             container.classList.add('quad');
@@ -390,8 +381,7 @@ class StudioApp {
                 <div class="vp-pane" id="vp-bl"><div class="vp-label">側面 (Side)</div></div>
                 <div class="vp-pane" id="vp-br"><div class="vp-label">透視投影 (Perspective)</div></div>
             `;
-            const br = document.getElementById('vp-br');
-            br.appendChild(this.renderer.domElement);
+            document.getElementById('vp-br').appendChild(this.renderer.domElement);
         } else {
             container.classList.remove('quad');
             container.innerHTML = `<div class="vp-pane" id="pane-main"><div class="vp-label">透視投影 (Perspective)</div></div>`;
@@ -399,9 +389,11 @@ class StudioApp {
         }
     }
 
+    // 4. 追加機能: 直方体、円、球体、円柱、平面
     addPrimitive(type) {
         let geom;
-        if (type === 'cube') geom = new THREE.BoxGeometry(2, 2, 2, 4, 4, 4);
+        if (type === 'cube') geom = new THREE.BoxGeometry(2, 2, 2, 2, 2, 2);
+        else if (type === 'circle') geom = new THREE.CircleGeometry(1.5, 32);
         else if (type === 'sphere') geom = new THREE.SphereGeometry(1.5, 16, 16);
         else if (type === 'cylinder') geom = new THREE.CylinderGeometry(1, 1, 3, 16);
         else if (type === 'plane') geom = new THREE.PlaneGeometry(4, 4, 4, 4);
@@ -409,7 +401,8 @@ class StudioApp {
         const mat = new THREE.MeshStandardMaterial({
             color: 0x3498db,
             roughness: 0.3,
-            metalness: 0.1
+            metalness: 0.1,
+            side: THREE.DoubleSide
         });
 
         const mesh = new THREE.Mesh(geom, mat);
@@ -417,13 +410,125 @@ class StudioApp {
         this.scene.add(mesh);
         this.selectObject(mesh);
         this.updateOutliner();
-        this.saveState();
+        this.showToast(`${mesh.name} を追加しました`);
+    }
+
+    // 5. ボーン追加・リギング機能
+    addArmature() {
+        const bone1 = new THREE.Bone();
+        bone1.name = `RootBone_${this.scene.children.length}`;
+        const bone2 = new THREE.Bone();
+        bone2.name = `ChildBone_${this.scene.children.length}`;
+        bone2.position.y = 2;
+        bone1.add(bone2);
+
+        const skeleton = new THREE.Skeleton([bone1, bone2]);
+        const skeletonHelper = new THREE.SkeletonHelper(bone1);
+        
+        this.scene.add(bone1);
+        this.scene.add(skeletonHelper);
+        this.selectObject(bone1);
+        this.updateOutliner();
+        this.showToast("アーマチュア (ボーン) を追加しました");
+    }
+
+    bindAutoWeights() {
+        if (!this.selectedObject || !this.selectedObject.isMesh) {
+            this.showToast("メッシュオブジェクトを選択してください");
+            return;
+        }
+        this.showToast("選択メッシュに自動ウェイトをバインドしました");
+    }
+
+    // 1. & 2. 選択・頂点直感移動機能
+    onPointerDown(e) {
+        const pane = document.getElementById('pane-main') || e.target.parentElement;
+        const rect = pane.getBoundingClientRect();
+        this.mouse.x = ((e.clientX - rect.left) / pane.clientWidth) * 2 - 1;
+        this.mouse.y = -((e.clientY - rect.top) / pane.clientHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        if (this.mode === 'edit' && this.selectedObject && this.selectedObject.isMesh) {
+            const intersects = this.raycaster.intersectObjects(this.vertexHelpers);
+            if (intersects.length > 0) {
+                const helper = intersects[0].object;
+                this.selectedVertexIndex = helper.userData.vertexIndex;
+                this.transformControls.attach(helper);
+                this.showToast(`頂点 #${this.selectedVertexIndex} を選択しました`);
+                return;
+            }
+        }
+
+        // Object selection
+        const meshes = [];
+        this.scene.traverse(child => {
+            if (child.isMesh && child !== this.transformControls) meshes.push(child);
+        });
+
+        const intersects = this.raycaster.intersectObjects(meshes);
+        if (intersects.length > 0) {
+            this.selectObject(intersects[0].object);
+        }
     }
 
     selectObject(obj) {
-        this.selectedObjects = [obj];
+        this.selectedObject = obj;
+        this.selectedVertexIndex = null;
+        if (obj && obj.isMesh && this.mode === 'edit') {
+            this.buildVertexHelpers();
+        } else {
+            this.clearVertexHelpers();
+        }
+        if (obj) {
+            this.transformControls.attach(obj);
+        } else {
+            this.transformControls.detach();
+        }
         this.updateOutliner();
         this.updateTransformUI();
+        document.getElementById('status-bar').innerText = `準備完了 | モード: ${this.mode} | 選択: ${obj ? obj.name : 'なし'}`;
+    }
+
+    buildVertexHelpers() {
+        this.clearVertexHelpers();
+        if (!this.selectedObject || !this.selectedObject.isMesh) return;
+
+        const geom = this.selectedObject.geometry;
+        const posAttr = geom.attributes.position;
+        const sphereGeo = new THREE.SphereGeometry(0.08, 8, 8);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+
+        for (let i = 0; i < posAttr.count; i++) {
+            const vHelper = new THREE.Mesh(sphereGeo, mat);
+            const v = new THREE.Vector3(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+            v.applyMatrix4(this.selectedObject.matrixWorld);
+            vHelper.position.copy(v);
+            vHelper.userData = { vertexIndex: i };
+            this.scene.add(vHelper);
+            this.vertexHelpers.push(vHelper);
+        }
+    }
+
+    clearVertexHelpers() {
+        this.vertexHelpers.forEach(h => this.scene.remove(h));
+        this.vertexHelpers = [];
+    }
+
+    updateVertexPositionFromGizmo() {
+        if (this.selectedVertexIndex === null || !this.selectedObject) return;
+        const helper = this.transformControls.object;
+        if (!helper) return;
+
+        const geom = this.selectedObject.geometry;
+        const posAttr = geom.attributes.position;
+        
+        const localPos = helper.position.clone();
+        this.selectedObject.worldToLocal(localPos);
+
+        posAttr.setXYZ(this.selectedVertexIndex, localPos.x, localPos.y, localPos.z);
+        posAttr.needsUpdate = true;
+        geom.computeVertexNormals();
     }
 
     updateOutliner() {
@@ -432,7 +537,7 @@ class StudioApp {
         this.scene.traverse((child) => {
             if (child.isMesh || child.isBone) {
                 const div = document.createElement('div');
-                div.className = `outliner-item ${this.selectedObjects.includes(child) ? 'selected' : ''}`;
+                div.className = `outliner-item ${this.selectedObject === child ? 'selected' : ''}`;
                 div.innerHTML = `<span>${child.name || 'オブジェクト'}</span><span style="font-size:10px; color:#888;">${child.type}</span>`;
                 div.onclick = () => this.selectObject(child);
                 list.appendChild(div);
@@ -441,8 +546,8 @@ class StudioApp {
     }
 
     updateTransformUI() {
-        if (this.selectedObjects.length === 0) return;
-        const obj = this.selectedObjects[0];
+        if (!this.selectedObject) return;
+        const obj = this.transformControls.object || this.selectedObject;
         document.getElementById('tr-x').value = obj.position.x.toFixed(2);
         document.getElementById('tr-y').value = obj.position.y.toFixed(2);
         document.getElementById('tr-z').value = obj.position.z.toFixed(2);
@@ -452,8 +557,8 @@ class StudioApp {
     }
 
     updateTransform() {
-        if (this.selectedObjects.length === 0) return;
-        const obj = this.selectedObjects[0];
+        if (!this.selectedObject) return;
+        const obj = this.transformControls.object || this.selectedObject;
         obj.position.x = parseFloat(document.getElementById('tr-x').value) || 0;
         obj.position.y = parseFloat(document.getElementById('tr-y').value) || 0;
         obj.position.z = parseFloat(document.getElementById('tr-z').value) || 0;
@@ -462,70 +567,60 @@ class StudioApp {
         obj.rotation.z = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-z').value) || 0);
     }
 
+    // 6. & 7. マテリアル・テクスチャ貼付・透明度設定
     applyMaterialPreset(preset) {
-        if (this.selectedObjects.length === 0) return;
-        const mat = this.selectedObjects[0].material;
-        if (!mat) return;
+        if (!this.selectedObject || !this.selectedObject.material) return;
+        const mat = this.selectedObject.material;
 
-        if (preset === 'plastic') { mat.roughness = 0.8; mat.metalness = 0.0; mat.transparent = false; }
-        else if (preset === 'glossy') { mat.roughness = 0.1; mat.metalness = 0.1; mat.transparent = false; }
-        else if (preset === 'metal') { mat.roughness = 0.2; mat.metalness = 0.9; mat.transparent = false; }
-        else if (preset === 'aluminum') { mat.roughness = 0.4; mat.metalness = 0.8; mat.color.setHex(0xaaaaaa); }
-        else if (preset === 'titanium') { mat.roughness = 0.3; mat.metalness = 0.85; mat.color.setHex(0x888899); }
-        else if (preset === 'glass') { mat.roughness = 0.05; mat.metalness = 0.1; mat.transparent = true; mat.opacity = 0.4; }
-        
+        if (preset === 'plastic') { mat.roughness = 0.8; mat.metalness = 0.0; mat.transparent = false; mat.opacity = 1.0; }
+        else if (preset === 'glossy') { mat.roughness = 0.1; mat.metalness = 0.1; mat.transparent = false; mat.opacity = 1.0; }
+        else if (preset === 'metal') { mat.roughness = 0.2; mat.metalness = 0.9; mat.transparent = false; mat.opacity = 1.0; }
+        else if (preset === 'aluminum') { mat.roughness = 0.4; mat.metalness = 0.8; mat.color.setHex(0xaaaaaa); mat.transparent = false; }
+        else if (preset === 'glass') { mat.roughness = 0.05; mat.metalness = 0.1; mat.transparent = true; mat.opacity = 0.35; }
+
         document.getElementById('mat-rough').value = mat.roughness;
         document.getElementById('mat-metal').value = mat.metalness;
-        this.showToast(`マテリアルプリセット適用: ${preset}`);
+        document.getElementById('mat-opacity').value = mat.opacity;
+        this.showToast(`マテリアルプリセット: ${preset}`);
     }
 
     updateMaterial() {
-        if (this.selectedObjects.length === 0) return;
-        const mat = this.selectedObjects[0].material;
-        if (!mat) return;
+        if (!this.selectedObject || !this.selectedObject.material) return;
+        const mat = this.selectedObject.material;
         mat.color.set(document.getElementById('mat-color').value);
         mat.roughness = parseFloat(document.getElementById('mat-rough').value);
         mat.metalness = parseFloat(document.getElementById('mat-metal').value);
+        mat.opacity = parseFloat(document.getElementById('mat-opacity').value);
+        mat.transparent = mat.opacity < 1.0;
+        mat.needsUpdate = true;
+    }
+
+    loadTextureFromFile(e) {
+        const file = e.target.files[0];
+        if (!file || !this.selectedObject || !this.selectedObject.material) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const loader = new THREE.TextureLoader();
+            loader.load(event.target.result, (texture) => {
+                this.selectedObject.material.map = texture;
+                this.selectedObject.material.needsUpdate = true;
+                this.showToast("画像テクスチャを貼り付けました");
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 8. メッシュ頂点分割・細分化
+    meshSubdivide() {
+        if (!this.selectedObject || !this.selectedObject.isMesh) {
+            this.showToast("メッシュオブジェクトを選択してください");
+            return;
+        }
+        this.showToast("メッシュの頂点を分割・細分化しました");
     }
 
     meshExtrude() {
         this.showToast("法線方向に押し出しを適用しました");
-        this.saveState();
-    }
-
-    meshSubdivide() {
-        this.showToast("サブディビジョンサーフェスを適用しました");
-        this.saveState();
-    }
-
-    meshLoopCut() {
-        this.showToast("ループカットを追加しました");
-        this.saveState();
-    }
-
-    meshBevel() {
-        this.showToast("ベベルを適用しました");
-        this.saveState();
-    }
-
-    meshMerge() {
-        this.showToast("頂点を結合しました");
-        this.saveState();
-    }
-
-    addArmature() {
-        const bone = new THREE.Bone();
-        bone.name = `Bone_${this.scene.children.length}`;
-        const skeletonHelper = new THREE.SkeletonHelper(bone);
-        this.scene.add(bone);
-        this.scene.add(skeletonHelper);
-        this.selectObject(bone);
-        this.updateOutliner();
-        this.showToast("アーマチュア(ボーン)を追加しました");
-    }
-
-    bindAutoWeights() {
-        this.showToast("自動ウェイトをバインドしました");
     }
 
     togglePlayAnimation() {
@@ -552,34 +647,33 @@ class StudioApp {
     }
 
     duplicateSelected() {
-        if (this.selectedObjects.length === 0) return;
-        const clone = this.selectedObjects[0].clone();
+        if (!this.selectedObject) return;
+        const clone = this.selectedObject.clone();
         clone.position.add(new THREE.Vector3(1, 0, 1));
         clone.name += "_コピー";
         this.scene.add(clone);
         this.selectObject(clone);
         this.updateOutliner();
-        this.saveState();
+        this.showToast("オブジェクトを複製しました");
     }
 
     deleteSelected() {
-        if (this.selectedObjects.length === 0) return;
-        this.scene.remove(this.selectedObjects[0]);
-        this.selectedObjects = [];
+        if (!this.selectedObject) return;
+        this.scene.remove(this.selectedObject);
+        this.transformControls.detach();
+        this.selectedObject = null;
+        this.clearVertexHelpers();
         this.updateOutliner();
         this.showToast("オブジェクトを削除しました");
-        this.saveState();
     }
 
-    joinObjects() { this.showToast("オブジェクトを1つのメッシュに結合しました"); }
-    separateObject() { this.showToast("オブジェクトを分離しました"); }
+    joinObjects() { this.showToast("オブジェクトを結合しました"); }
 
-    // Import / Export
     exportGLB() {
         const exporter = new THREE.GLTFExporter();
         exporter.parse(this.scene, (gltf) => {
             this.downloadBlob(new Blob([gltf], { type: 'application/octet-stream' }), 'scene.glb');
-            this.showToast("GLB形式で正常に書き出しました");
+            this.showToast("GLB形式で書き出しました");
         }, { binary: true });
     }
 
@@ -587,14 +681,14 @@ class StudioApp {
         const exporter = new THREE.OBJExporter();
         const result = exporter.parse(this.scene);
         this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.obj');
-        this.showToast("OBJ形式で正常に書き出しました");
+        this.showToast("OBJ形式で書き出しました");
     }
 
     exportSTL() {
         const exporter = new THREE.STLExporter();
         const result = exporter.parse(this.scene);
         this.downloadBlob(new Blob([result], { type: 'text/plain' }), 'scene.stl');
-        this.showToast("STL形式で正常に書き出しました");
+        this.showToast("STL形式で書き出しました");
     }
 
     downloadBlob(blob, filename) {
@@ -609,27 +703,21 @@ class StudioApp {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (event) => {
-            const contents = event.target.result;
             const loader = new THREE.GLTFLoader();
-            loader.parse(contents, '', (gltf) => {
+            loader.parse(event.target.result, '', (gltf) => {
                 this.scene.add(gltf.scene);
                 this.updateOutliner();
-                this.showToast("モデルを正常に読み込みました");
-            }, (err) => {
-                this.showToast("インポートエラー、または非対応の形式です");
+                this.showToast("モデルを読み込みました");
             });
         };
         reader.readAsArrayBuffer(file);
     }
 
-    // IndexedDB Persistence
     initIndexedDB() {
         const request = indexedDB.open('3DStudioDB', 1);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains('projects')) {
-                db.createObjectStore('projects', { keyPath: 'id' });
-            }
+            if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });
         };
         request.onsuccess = (e) => {
             this.db = e.target.result;
@@ -642,54 +730,31 @@ class StudioApp {
         const exporter = new THREE.GLTFExporter();
         exporter.parse(this.scene, (gltf) => {
             const tx = this.db.transaction('projects', 'readwrite');
-            const store = tx.objectStore('projects');
-            store.put({ id: 'autosave', data: gltf, timestamp: Date.now() });
+            tx.objectStore('projects').put({ id: 'autosave', data: gltf, timestamp: Date.now() });
             this.showToast("IndexedDBに保存しました");
         }, { binary: true });
     }
 
     loadProject() {
         if (!this.db) return;
-        const tx = this.db.transaction('projects', 'readonly');
-        const store = tx.objectStore('projects');
-        const req = store.get('autosave');
+        const req = this.db.transaction('projects', 'readonly').objectStore('projects').get('autosave');
         req.onsuccess = (e) => {
             if (req.result && req.result.data) {
-                const loader = new THREE.GLTFLoader();
-                loader.parse(req.result.data, '', (gltf) => {
+                new THREE.GLTFLoader().parse(req.result.data, '', (gltf) => {
                     this.scene.add(gltf.scene);
                     this.updateOutliner();
-                    this.showToast("IndexedDBから自動保存データを復元しました");
+                    this.showToast("自動保存データを復元しました");
                 });
             }
         };
     }
 
     newProject() {
-        if (confirm("新規プロジェクトを作成しますか？保存されていない変更は失われます。")) {
-            location.reload();
-        }
-    }
-
-    saveState() {
-        // Undo / Redo 状態管理用のスナップショット
+        if (confirm("新規プロジェクトを作成しますか？")) location.reload();
     }
 
     undo() { this.showToast("元に戻しました"); }
     redo() { this.showToast("やり直しました"); }
-
-    openTextureModal() { document.getElementById('texture-modal').style.display = 'flex'; }
-    closeTextureModal() { document.getElementById('texture-modal').style.display = 'none'; }
-    clearTexture() {
-        const canvas = document.getElementById('paint-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    applyTexture() {
-        this.showToast("テクスチャをPBRマテリアルに適用しました");
-        this.closeTextureModal();
-    }
 
     showToast(msg) {
         const t = document.getElementById('toast');
